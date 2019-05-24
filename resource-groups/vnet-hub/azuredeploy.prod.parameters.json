@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dtap": {"value": "production"},
+    "ring": {"value": 0},
+    "location": { "value": "West Europe" },
+    "vnet-name": { "value": "pat-prod-hub-vnet" },
+    "vnet-prefix": { "value": "10.0.0.0/21" },
+    "admin-subnet-name": { "value": "admin" },
+    "peering-subnet-name": { "value": "peering" },
+    "gateway-subnet-prefix": { "value": "10.0.0.0/24"},
+    "admin-subnet-prefix": { "value": "10.0.1.0/24" },
+    "peering-subnet-prefix": { "value": "10.0.2.0/24" }
+  }
+}

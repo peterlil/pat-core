@@ -1,0 +1,90 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dtap": {
+      "type": "string",
+      "allowedValues": [
+        "production",
+        "user acceptance test",
+        "test",
+        "development"
+      ]
+    },
+    "ring": {
+      "type": "int"
+    },
+    "location": {
+      "type": "string"
+    },
+    "vnet-name": { 
+      "type": "string",
+      "allowedValues": [
+        "pat-prod-hub-vnet"
+      ],
+      "defaultValue": "pat-prod-hub-vnet"
+    },
+    "vnet-prefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/21"
+    },
+    "admin-subnet-name": { 
+      "type": "string" 
+    },
+    "peering-subnet-name": { 
+      "type": "string" 
+    },
+    "gateway-subnet-prefix": { 
+      "type": "string",
+      "defaultValue": "10.0.0.0/24"
+    },
+    "admin-subnet-prefix": { 
+      "type": "string",
+      "defaultValue": "10.0.1.0/24"
+    },
+    "peering-subnet-prefix": { 
+      "type": "string",
+      "defaultValue": "10.0.2.0/24" 
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "name": "[parameters('vnet-name')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[parameters('location')]",
+      "apiVersion": "2018-11-01",
+      "dependsOn": [ ],
+      "tags": {
+        "dtap": "[parameters('dtap')]"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnet-prefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[parameters('gateway-subnet-prefix')]"
+            }
+          },
+          {
+            "name": "[parameters('admin-subnet-name')]",
+            "properties": {
+              "addressPrefix": "[parameters('admin-subnet-prefix')]"
+            }
+          },
+          {
+            "name": "[parameters('peering-subnet-name')]",
+            "properties": {
+              "addressPrefix": "[parameters('peering-subnet-prefix')]"
+            }
+          }
+        ]
+      }
+    }],
+  "outputs": {}
+}
