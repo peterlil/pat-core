@@ -49,5 +49,11 @@ if( $azureAdApplication ) {
 	exit 1
 }
 
+Set-AzureRmKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication -EnabledForDeployment -EnabledForTemplateDeployment `
+    -PermissionsToKeys Decrypt,Encrypt,UnwrapKey,WrapKey,Verify,Sign,Get,List,Update,Create,Import,Delete,Backup,Restore,Recover,Purge `
+    -PermissionsToSecrets Get,List,Set,Delete,Backup,Restore,Recover,Purge `
+    -PermissionsToCertificates Get,List,Delete,Create,Import,Update,Managecontacts,Getissuers,Listissuers,Setissuers,Deleteissuers,Manageissuers,Recover,Backup,Restore,Purge `
+    -PassThru
+
 #hard-coded
-Set-AzureKeyVaultSecret -VaultName $kvName -Name $"DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
+Set-AzureKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
