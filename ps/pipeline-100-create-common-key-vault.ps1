@@ -17,6 +17,8 @@ Write-Verbose "sourcePath: $sourcePath"
 ###############################################################################
 
 $kvName = "devops-kv"
+$rgName = "pat-core"
+$location = "west europe"
 
 $kv = Get-AzureRmKeyVault -Name $kvName -ErrorAction SilentlyContinue
 
