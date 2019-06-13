@@ -46,7 +46,7 @@ if($rg) {
 }
 
 ################################################################################
-### Create the Key Vault
+### Create the core Key Vault
 ################################################################################
 
 $kvName = Read-Host 'Enter the name of the core Azure Key Vault resource'
