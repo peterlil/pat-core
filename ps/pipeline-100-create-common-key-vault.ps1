@@ -16,7 +16,8 @@ Write-Verbose "sourcePath: $sourcePath"
 # Create the common properties key vault
 ###############################################################################
 
-$kvName = "devops-kv"
+#hard-coded
+$kvName = "pat-devops-kv"
 $rgName = "pat-core"
 $location = "west europe"
 
@@ -39,7 +40,7 @@ Set-AzureKeyVaultSecret -VaultName $kvName -Name $"TenantId" -SecretValue (Conve
 ###############################################################################
 # Add the object id of the DevOps account
 ###############################################################################
-$azDevOpsAppName = "pat-devops"
+$azDevOpsAppName = "pat-devops" #hard-coded
 $azureAdApplication = Get-AzureRmADApplication -DisplayNameStartWith $azDevOpsAppName -ErrorAction SilentlyContinue
 if( $azureAdApplication ) {
     Write-Host "AAD Application: $($azureAdApplication.ApplicationId)"
@@ -48,4 +49,5 @@ if( $azureAdApplication ) {
 	exit 1
 }
 
+#hard-coded
 Set-AzureKeyVaultSecret -VaultName $kvName -Name $"DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
