@@ -104,9 +104,28 @@ if( !$aadServicePrincipal ) {
 Write-Host "AAD Service Principal: $($aadServicePrincipal.Id)"
 
 ################################################################################
-### Add the service principal credentials to KeyVault
+### Grant the service principal access to the key vault
 ################################################################################
 
-Set-AzureKeyVaultSecret -VaultName $kvName -Name $aadServicePrincipal.Id -SecretValue $aadClientSecret
+Set-AzureRmKeyVaultAccessPolicy -VaultName $kvName -ObjectId $aadServicePrincipal.Id `
+    -PermissionsToKeys Decrypt,Encrypt,UnwrapKey,WrapKey,Verify,Sign,Get,List,Update,Create,Import,Delete,Backup,Restore,Recover,Purge `
+    -PermissionsToSecrets Get,List,Set,Delete,Backup,Restore,Recover,Purge `
+    -PermissionsToCertificates Get,List,Delete,Create,Import,Update,Managecontacts,Getissuers,Listissuers,Setissuers,Deleteissuers,Manageissuers,Recover,Backup,Restore,Purge `
+    -PassThru
+
+###############################################################################
+# Add the DevOpsAccountObjectId
+###############################################################################
+Write-Verbose "Adding the DevOpsAccountObjectId to key vault"
+Set-AzureKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $aadServicePrincipal -AsPlainText -Force)
+
+###############################################################################
+# Add the Tenant ID
+###############################################################################
+Write-Verbose "Adding TenantId to key vault"
+$context = Get-AzureRmContext
+Set-AzureKeyVaultSecret -VaultName $kvName -Name "TenantId" -SecretValue (ConvertTo-SecureString $context.Tenant.Id -AsPlainText -Force)
+
+
 
 Write-Host 'Finished'
