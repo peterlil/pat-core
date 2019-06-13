@@ -1,3 +1,6 @@
+param(
+    [bool] $AlreadySignedIn = $false
+)
 ################################################################################
 ### Pre-requisites
 ################################################################################
@@ -7,18 +10,20 @@
 ################################################################################
 ### Login to Azure. 
 ################################################################################
-# Do the login prompt
-Login-AzureRmAccount
+if( $AlreadySignedIn -eq $false ) {
+    # Do the login prompt
+    Login-AzureRmAccount
 
-# Prompt for subscription selection
-$subscriptionId = 
-    ( Get-AzureRmSubscription |
-        Out-GridView `
-          -Title "Select an Azure Subscription …" `
-          -PassThru
-    ).Id
+    # Prompt for subscription selection
+    $subscriptionId = 
+        ( Get-AzureRmSubscription |
+            Out-GridView `
+            -Title "Select an Azure Subscription …" `
+            -PassThru
+        ).Id
 
-Get-AzureRmSubscription -SubscriptionId $subscriptionId | Select-AzureRmSubscription
+    Get-AzureRmSubscription -SubscriptionId $subscriptionId | Select-AzureRmSubscription
+}
 
 ################################################################################
 ### Create the core resource group 
@@ -117,7 +122,7 @@ Set-AzureRmKeyVaultAccessPolicy -VaultName $kvName -ObjectId $aadServicePrincipa
 # Add the DevOpsAccountObjectId
 ###############################################################################
 Write-Verbose "Adding the DevOpsAccountObjectId to key vault"
-Set-AzureKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $aadServicePrincipal -AsPlainText -Force)
+Set-AzureKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $aadServicePrincipal.Id -AsPlainText -Force)
 
 ###############################################################################
 # Add the Tenant ID
