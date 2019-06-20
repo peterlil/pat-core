@@ -26,13 +26,13 @@ $kvName = "pat-devops-kv"
 $rgName = "pat-core"
 $location = "west europe"
 
-$kv = Get-AzKeyVault -Name $kvName -ErrorAction SilentlyContinue
+$kv = Get-AzureRmKeyVault -Name $kvName -ErrorAction SilentlyContinue
 
 if($kv) {
     Write-Host "Key Vault already exists."
 } else {
     Write-Host "Creating Key Vault"
-    $kv = New-AzKeyVault -VaultName $kvName -ResourceGroupName $rgName -Location $location -EnabledForDeployment -EnabledForTemplateDeployment -EnabledForDiskEncryption
+    $kv = New-AzureRmKeyVault -VaultName $kvName -ResourceGroupName $rgName -Location $location -EnabledForDeployment -EnabledForTemplateDeployment -EnabledForDiskEncryption
 }
 
 ###############################################################################
@@ -49,7 +49,7 @@ if( $azureAdApplication ) {
 }
 
 Write-Verbose "Setting access policies"
-Set-AzKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication -EnabledForDeployment -EnabledForTemplateDeployment `
+Set-AzureRmKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication -EnabledForDeployment -EnabledForTemplateDeployment `
     -PermissionsToKeys Decrypt,Encrypt,UnwrapKey,WrapKey,Verify,Sign,Get,List,Update,Create,Import,Delete,Backup,Restore,Recover,Purge `
     -PermissionsToSecrets Get,List,Set,Delete,Backup,Restore,Recover,Purge `
     -PermissionsToCertificates Get,List,Delete,Create,Import,Update,Managecontacts,Getissuers,Listissuers,Setissuers,Deleteissuers,Manageissuers,Recover,Backup,Restore,Purge `
@@ -57,12 +57,12 @@ Set-AzKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication -Ena
 
 Write-Verbose "Adding the DevOpsAccountObjectId to key vault"
 #hard-coded
-Set-AzKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
+Set-AzureKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
 
 ###############################################################################
 # Add the Tenant ID
 ###############################################################################
 Write-Verbose "Adding TenantId to key vault"
-$context = Get-AzContext
-Set-AzKeyVaultSecret -VaultName $kvName -Name "TenantId" -SecretValue (ConvertTo-SecureString $context.Tenant.Id -AsPlainText -Force)
+$context = Get-AzureRmContext
+Set-AzureKeyVaultSecret -VaultName $kvName -Name "TenantId" -SecretValue (ConvertTo-SecureString $context.Tenant.Id -AsPlainText -Force)
 
