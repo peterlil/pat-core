@@ -26,13 +26,13 @@ $kvName = "pat-devops-kv"
 $rgName = "pat-core"
 $location = "west europe"
 
-$kv = Get-AzureRmKeyVault -Name $kvName -ErrorAction SilentlyContinue
+$kv = Get-AzKeyVault -Name $kvName -ErrorAction SilentlyContinue
 
 if($kv) {
     Write-Host "Key Vault already exists."
 } else {
     Write-Host "Creating Key Vault"
-    $kv = New-AzureRmKeyVault -VaultName $kvName -ResourceGroupName $rgName -Location $location -EnabledForDeployment -EnabledForTemplateDeployment -EnabledForDiskEncryption
+    $kv = New-AzKeyVault -VaultName $kvName -ResourceGroupName $rgName -Location $location -EnabledForDeployment -EnabledForTemplateDeployment -EnabledForDiskEncryption
 }
 
 ###############################################################################
@@ -40,7 +40,7 @@ if($kv) {
 ###############################################################################
 Write-Verbose "Getting the DevOps account Object Id"
 $azDevOpsAppName = "pat-devops" #hard-coded
-$azureAdApplication = Get-AzureRmADApplication -DisplayNameStartWith $azDevOpsAppName -ErrorAction SilentlyContinue
+$azureAdApplication = Get-AzADApplication -DisplayNameStartWith $azDevOpsAppName -ErrorAction SilentlyContinue
 if( $azureAdApplication ) {
     Write-Host "AAD Application: $($azureAdApplication.ApplicationId)"
 } else {
@@ -49,7 +49,7 @@ if( $azureAdApplication ) {
 }
 
 Write-Verbose "Setting access policies"
-Set-AzureRmKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication -EnabledForDeployment -EnabledForTemplateDeployment `
+Set-AzKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication -EnabledForDeployment -EnabledForTemplateDeployment `
     -PermissionsToKeys Decrypt,Encrypt,UnwrapKey,WrapKey,Verify,Sign,Get,List,Update,Create,Import,Delete,Backup,Restore,Recover,Purge `
     -PermissionsToSecrets Get,List,Set,Delete,Backup,Restore,Recover,Purge `
     -PermissionsToCertificates Get,List,Delete,Create,Import,Update,Managecontacts,Getissuers,Listissuers,Setissuers,Deleteissuers,Manageissuers,Recover,Backup,Restore,Purge `
@@ -57,12 +57,12 @@ Set-AzureRmKeyVaultAccessPolicy -VaultName $kvName -ObjectId $azureAdApplication
 
 Write-Verbose "Adding the DevOpsAccountObjectId to key vault"
 #hard-coded
-Set-AzureKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
+Set-AzKeyVaultSecret -VaultName $kvName -Name "DevOpsAccountObjectId" -SecretValue (ConvertTo-SecureString $azureAdApplication.ApplicationId -AsPlainText -Force)
 
 ###############################################################################
 # Add the Tenant ID
 ###############################################################################
 Write-Verbose "Adding TenantId to key vault"
-$context = Get-AzureRmContext
-Set-AzureKeyVaultSecret -VaultName $kvName -Name "TenantId" -SecretValue (ConvertTo-SecureString $context.Tenant.Id -AsPlainText -Force)
+$context = Get-AzContext
+Set-AzKeyVaultSecret -VaultName $kvName -Name "TenantId" -SecretValue (ConvertTo-SecureString $context.Tenant.Id -AsPlainText -Force)
 
